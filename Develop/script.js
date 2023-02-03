@@ -1,77 +1,57 @@
-// updates time on the webpage
-function updateTime() {
-  let today = moment();
+// Display today's day and date
+var todayDate = moment().format('dddd, MMM Do YYYY');
+$("#currentDay").html(todayDate);
 
-  // updates the time element in the header
-  $("#currentDay").text(today.format("dddd, MMMM Do YYYY, h:mm.ss"));
+$(document).ready(function () {
+    // saveBtn click listener 
+    $(".saveBtn").on("click", function () {
+        // Get nearby values of the description in JQuery
+        var text = $(this).siblings(".description").val();
+        var time = $(this).parent().attr("id");
 
-  // For coloring the past, present, and future time blocks
-  let now = moment().format("kk");
-  for (let i = 0; i < scheduleElArray.length; i++) {
-      scheduleElArray[i].removeClass("future past present");
+        // Save text in local storage
+        localStorage.setItem(time, text);
+    })
+   
+    function timeTracker() {
+        //get current number of hours.
+        var timeNow = moment().hour();
 
-      if (now > scheduleElArray[i].data("hour")) {
-          scheduleElArray[i].addClass("past");
+        // loop over time blocks
+        $(".time-block").each(function () {
+            var blockTime = parseInt($(this).attr("id").split("hour")[1]);
 
-      } else if (now === scheduleElArray[i].attr("data-hour")) {
-          scheduleElArray[i].addClass("present");
+            // To check the time and add the classes for background indicators
+            if (blockTime < timeNow) {
+                $(this).removeClass("future");
+                $(this).removeClass("present");
+                $(this).addClass("past");
+            }
+            else if (blockTime === timeNow) {
+                $(this).removeClass("past");
+                $(this).removeClass("future");
+                $(this).addClass("present");
+            }
+            else {
+                $(this).removeClass("present");
+                $(this).removeClass("past");
+                $(this).addClass("future");
 
-      } else {
+            }
+        })
+    }
 
-          scheduleElArray[i].addClass("future");
-      }
-  }
-}
+    // Get item from local storage if any
+    $("#hour8 .description").val(localStorage.getItem("hour8"));
+    $("#hour9 .description").val(localStorage.getItem("hour9"));
+    $("#hour10 .description").val(localStorage.getItem("hour10"));
+    $("#hour11 .description").val(localStorage.getItem("hour11"));
+    $("#hour12 .description").val(localStorage.getItem("hour12"));
+    $("#hour13 .description").val(localStorage.getItem("hour13"));
+    $("#hour14 .description").val(localStorage.getItem("hour14"));
+    $("#hour15 .description").val(localStorage.getItem("hour15"));
+    $("#hour16 .description").val(localStorage.getItem("hour16"));
+    $("#hour17 .description").val(localStorage.getItem("hour17"));
 
-// textarea elements
-let saveBttn = $(".save-icon");
-let containerEl = $(".container");
-let schedule9am = $("#9AM");
-let schedule10am = $("#10AM");
-let schedule11am = $("#11AM");
-let schedule12pm = $("#12PM");
-let schedule1pm = $("#1PM");
-let schedule2pm = $("#2PM");
-let schedule3pm = $("#3PM");
-let schedule4pm = $("#4PM");
-let schedule5pm = $("#5PM");
-
-let scheduleElArray = [
-  schedule9am,
-  schedule10am,
-  schedule11am,
-  schedule12pm,
-  schedule1pm,
-  schedule2pm,
-  schedule3pm,
-  schedule4pm,
-  schedule5pm,
-];
-
-renderLastRegistered();
-updateTime();
-setInterval(updateTime, 1000); 
-
-// render schedule saved in local storage
-function renderLastRegistered() {
-  for (let el of scheduleElArray) {
-      el.val(localStorage.getItem("time block " + el.data("hour")));
-
-  }
-}
-
-
-// function for handling clicks
-function handleFormSubmit(event) {
-  event.preventDefault();
-
-  let btnClicked = $(event.currentTarget);
-
-  let targetText = btnClicked.siblings("textarea");
-
-  let targetTimeBlock = targetText.data("hour");
-
-  localStorage.setItem("time block " +  targetTimeBlock, targetText.val());
-}
-
-saveBttn.on("click", handleFormSubmit);
+    timeTracker();
+})
